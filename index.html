@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <meta name="full-screen" content="yes">
+    <meta name="x5-fullscreen" content="true">
+    <title>店铺信息</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="storeinf_box">
+        <form action="">
+            <a href="storeName.html" class="bb tip"><label for="">店铺名称</label><span>加多超市</span></a>
+            <a href="#" class="bb"><label for="">地图定位</label><span>光谷金融港</span></a>
+            <a href="storeAddress.html" class="bb tip"><label for="">详细地址</label><span>光谷金融港一路A-13</span></a>
+            <a href="#" class="bb warning" id="type"><label for="">行业分类</label><span  id = 'typeD'>美食&nbsp;小吃快餐</span></a>
+            <p class="form_action"><button type="submit" class="orange_btn one">保存</button></p>
+        </form>
+    </div>
+    <div class="mask"></div>
+    <div class="selectType">
+        <div class="selected bboth"></div>
+        <div class="header"><span id="confirm">确定</span></div>
+        <div class="wrapper" id="wraPar"><div class="scroller"></div></div>
+        <div class="wrapper" id="wraSub"><div class="scroller"></div></div>
+    </div>
+    <script type="text/javascript" src="zepto.min.js"></script>
+    <script type="text/javascript" src="touch.js"></script>
+    <script type="text/javascript" src="interaction.min.js"></script>
+    <script type="text/javascript">
+     var pType = {'01':"美食", '02': '休闲娱乐', '03': '酒店', '04': '旅游', '05': '丽人', '06': '生活服务', '07': '购物', '08': '家装', '09': '其他'},
+      subType = {
+        '01':{'0101': '小吃快餐', '0102':'海鲜', '0103':'火锅', '0104':'西餐', '0105':'自助餐', '0106':'日本料理', '0107':'面包甜点', '0108':'烧烤/烤肉', '0109':'韩国料理', '0110':'咖啡茶馆', '0111':'冰淇淋', '0112':'其他美食'},
+        '02': {'0201': 'KTV', '0202': '足疗按摩', '0203': '洗浴/汗蒸', '0204': '密室逃脱', '0205':'桌游/电玩/网吧', '0206':'酒吧', '0207':'游泳', '0208':'运动健身', '0209':'其他'},
+        '03': {'0301':'经济型酒店', '0302': '客栈/青旅/民宿', '0303': '豪华酒店', '0304': '主题精品酒店', '0305': '公寓式酒店', '0306': '度假酒店', '0307': '温泉酒店'},
+        '04':{'0401': '景点门票', '0402':'国内游', '0403':'当地/周边游'},
+        '05': {'0501': '美发', '0502': '美甲', '0503': '美容/SPA', '0504': '快餐', '0505': '瘦身纤体', '0506': '个性写真', '0507': '瑜伽/舞蹈', '0508': '其他'},
+        '06': {'0601':'全部生活服务', '0602': '汽车服务', '0603': '鲜花婚庆', '0604': '服装洗护', '0605': '培训课程', '0606': '宠物服务', '0607': '家政服务', '0608': '配眼镜', '0609': '其他'},
+        '07':{'0701': '服饰鞋包', '0702':'数码家电', '0703':'钟表眼镜', '0704':'生活家居', '0705': '珠宝饰品', '0706': '水果生鲜', '0707': '食品饮料', '0708': '影音书刊', '0709': '运动户外'},
+        '08': {'0801': '装修设计', '0802': '厨房卫浴', '0803': '建材', '0804': '家具家居', '0805': '家用电器'},
+        '09': {'0901':'其他'}
+      };
+      $('#wraPar').scrollerD({selector: '#wraSub', data: [pType, subType], initData:['01', '0101']});
+      $('#type').click(function(){$('body').addClass('stshow');});
+      $('.mask').click(function(){$('body').removeClass('stshow');});
+    </script>
+</body>
+</html>

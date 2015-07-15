@@ -1,0 +1,46 @@
+*{ box-sizing: border-box; text-align: left; -moz-box-sizing: border-box; -webkit-box-sizing: border-box;}
+a,button,input{outline: none;-webkit-touch-callout:none;border: none;cursor: pointer;}
+ul{list-style: none;padding: 0;margin: 0;}
+.orange_btn{ display:block; margin:20px 10px;height: 44px;background: #fe6600;text-align: center;line-height: 43px;font-size: 16px;color: #fff;border-radius: 22px;}
+.more{ color:#999;font-size: 12px; text-align: center;}
+.orange_btn:visited{ color:#fff;}
+.bb{border-bottom: 1px solid #ccc;}
+.bt{border-top: 1px solid #ccc;}
+.bboth{border-bottom: 1px solid #ccc;border-top: 1px solid #ccc;}
+.form_action{ display: block; margin: 10px; height: auto;overflow: hidden;}
+.form_action button.one{ width: 100%; margin: 0 0 10px;}
+
+/*店铺信息*/
+.storeinf_box{ display: block;}
+.storeinf_box a{display: block; background-color: #fff; padding:0 30px 0 75px; min-height:48px;line-height: 48px;font-size:14px; color:#333; clear: both; position: relative;}
+.storeinf_box div{ display: block; background-color: #fff; padding:0 10px 0 75px;font-size:14px; color:#333; clear: both; position: relative;}
+.storeinf_box textarea{width: 100%;margin: 14px 0; height: 20px; line-height: 20px; text-align: right;}
+.storeinf_box label{color:#999; position:absolute;left:10px; top:50%;margin-top: -7px;width: 60px; height: 14px; line-height: 14px;}
+.storeinf_box span{ display: block; width: 100%; height: 48px;text-align: right;overflow: hidden;white-space: nowrap;text-overflow: ellipsis;}
+.storeinf_box a.img{ height: 114px; line-height:84px; padding-top: 15px;}
+.storeinf_box a.img img{ width: 84px; height: 84px; border-radius: 3px;}
+.storeinf_box a.img span{ width: 84px; height: 84px; position: relative; float: right; margin-right: -20px;}
+.storeinf_box a.img span i{font-size:11px; display:block; width: 16px;height: 16px;position: absolute;right:6px;bottom: 6px;color: #fff;text-align: center;line-height: 16px;background: rgba(0, 0, 0, .5);border-radius: 50%;}
+/*.storeinf_box a span:after{content:""; top:50%; margin-top:-7px; position:absolute;right:10px; width:8px; height:14px;background-image: url(../images/ico_into.png);background-repeat: no-repeat;background-position: right center;background-size: 8px auto;}*/
+.storeinf_box a.img span:after{display: none;}
+.storeinf_box .tip span{padding-right: 18px;}
+.storeinf_box .tip textarea{padding-right: 18px;}
+.storeinf_box .form_action{padding-top:10px;}
+
+.selectType{position: absolute;bottom: 0;left:0;width: 100%;background-color: #fff;display: none;}
+.wrapper{width: 50%;float: left;overflow: hidden;height: 120px; position: relative;z-index: 2;color: #333;font-size: 14px;}
+.wrapper li{height: 40px;line-height: 40px;color: #666;}
+.selected{position: absolute;top: 80px;height: 40px;width: 100%;}
+.mask{position: fixed;top: 0;left: 0;right: 0;bottom: 0;background-color: rgba(0,0,0,.2);
+  display: none;}
+.header{height: 40px;text-align: right;color: #ff6600;font-size: 16px;position: relative;
+  background-color: #f8f8f8;z-index: 2;line-height: 40px;padding-right: 10px;}
+.header #confirm{display: block;float: right;height: 40px;line-height: 40px;padding: 0 10px;}
+#wraPar li{text-align: right;padding-right: 20px;}
+#wraSub li{text-align: left;padding-left: 20px;}
+.scroller{ -webkit-transition: all .5s;-o-transition: all .5s;transition: all .5s;}
+.scroller .active{font-size:16px;color: #333;}
+.stshow .selectType{display: block;}
+.stshow .mask{display: block;}
+
+
