@@ -7,8 +7,8 @@
 data[n]是n-1级数据。
 
 初始化使用
-$('.interaction').scrollerD({data: data, initData:['01', '0101'],
-        trigger:'#type',confirmHandler: function(typeStr){$('#typeD').html(typeStr);}});
+`$('.interaction').scrollerD({data: data, initData:['01', '0101'],
+        trigger:'#type',confirmHandler: function(typeStr){$('#typeD').html(typeStr);}});`
 
 initData分别是一级数据的id和二级数据的id。trigger表现触发的显示的元素。confirmHandler表示获取选择结果
 后的处理函数。
