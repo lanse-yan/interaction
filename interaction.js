@@ -1,33 +1,26 @@
 (function($){
-  /*
-    PType subType:生成分类的数据。其中pType是一级数据，subType是二级数据
-      当pType为空时，会没有任何分类可展示;当PType或subType中只有一条分类，则选
-      择这条数据且不可滚动。
-    itemHeight：行高，这里设置成40px.如果有变动，请修改这个变量。
-    currentArr：当前选择的分类的index([parIndex, subIndex])，指的是画面上的序数而非id
-    selectArr: 当前选择的分类的Id([parId, subId])，指的是数据中的id
-    _dis: 当前选择分类的分别移动的距离
-    _maxPar, _minPar, _minSub, _maxSub分别指分类的可以移动的最大值和最小值
-  */
   $.fn.scrollerD = function(opts){
     if(!this.length){return};
     opts = $.extend({},$.scrollerD.defaults,opts);
-    var obj = this, subObj = $(opts.selector),
+    var $wrap = this, $subObj,
     pType, subType,itemHeigth,currentArr=[1,1],selectArr=[],_dis=[0,0],
-    _maxPar, _minPar, _minSub, _maxSub, scrollerD = {};
+    _max=[], _min=[], scrollerD = {},level=2;
 
     scrollerD.init = function(){
-      pType = opts.data[0];
-      subType = opts.data[1];
       itemHeigth = opts.itemHeigth;
-      _minPar =  _minSub = itemHeigth;
-      scrollerD.createUI(pType, obj, true);
-      scrollerD.createUI(subType[selectArr[0]], subObj);
-      obj.add(subObj).on('touchmove', function(e){e.preventDefault();});
-      obj.swipeUp(scrollerD.swipeUp);
-      obj.swipeDown(scrollerD.swipeDown);
-      subObj.swipeUp(scrollerD.swipeSubUp);
-      subObj.swipeDown(scrollerD.swipeSubDown);
+      level = opts.data.length;
+      scrollerD.reset(_min, level, itemHeigth);//初始化向上滑动的最大距离
+      scrollerD.createWrap();//生成选中行以及确认按钮
+      $subObj = $wrap.find('.wrapper');
+      $subObj.width(100/level + '%');
+      scrollerD.createUI(opts.data[0], $subObj.eq(0), 0);//生成一级数据的dom结构
+      for(var i = 1; i < level; i++){
+        scrollerD.createUI(opts.data[i][selectArr[i-1]], $subObj.eq(i), i);
+      }
+
+      $wrap.on('touchmove', function(e){e.preventDefault();});
+      $subObj.swipeUp(scrollerD.swipeUp);
+      $subObj.swipeDown(scrollerD.swipeDown);
       $(opts.confirm).on('click', scrollerD.confirmHanlder);
     };
     scrollerD.animateTransform = function(obj, dis){
@@ -36,7 +29,14 @@
       + dis + 'px, 0)'};
       obj.css(value);
     };
-    scrollerD.createUI = function(data,el,isPar){
+    scrollerD.createWrap = function(){
+      var htmlArr = ['<div class="selected bboth"></div><div class="header"><span id="confirm">确定</span></div>'];
+      for(var i = 0; i < level; i++){
+        htmlArr.push('<div class="wrapper"><div class="scroller"></div></div>');
+      }
+      $wrap.append(htmlArr.join(''));
+    }
+    scrollerD.createUI = function(data, el, index){
       var $el = el.find('.scroller');
       $el.empty();
       if(!data){return;}
@@ -45,142 +45,119 @@
         $ul.append('<li data-id='+ attr+ '>'+valu+'</li>');
       });
       $el.append($ul);
-      if(isPar){
-        scrollerD.getPboundary(obj.find('li').length);
-      }else{
-        scrollerD.getSboundary(subObj.find('li').length);
-      }
+      scrollerD.getBoundary($el.find('li').length, index);
+      // if(isPar){
+      //   scrollerD.getPboundary($el.find('li').length);
+      // }else{
+      //   scrollerD.getSboundary($el.find('li').length, index);
+      // }
     };
     scrollerD.swipeUp = function(e){
-      var subId;
-      if(_dis[0] === _maxPar){return;}//滚动到最底下，不用再滚动了。
-      _dis[0] = _dis[0] - itemHeigth;
-      if(_dis[0] < _maxPar){_dis[0] = _maxPar;}
-      scrollerD.animateTransform($(this).find('.scroller'), _dis[0]);
-      currentArr[0] = currentArr[0] + 1;
+      var index = $('.wrapper').index(this), subId;
+      if(_dis[index] === _max[index]){return;}//滚动到最底下，不用再滚动了。
+      _dis[index] = _dis[index] - itemHeigth;
+      if(_dis[index] < _max[index]){_dis[index] = _max[index];}
+      scrollerD.animateTransform($(this).find('.scroller'), _dis[index]);
+      currentArr[index] = currentArr[index] + 1;
       subId = $(this).find('li').removeClass('active')
-        .eq(currentArr[0]).addClass('active').attr('data-id');
-      scrollerD.updateSubEle(subId);
+        .eq(currentArr[index]).addClass('active').attr('data-id');
+      if((index+1) !== level){scrollerD.updateSubEle(subId, index);}
+      selectArr[index] = subId;
     };
     scrollerD.swipeDown = function(e){
-      if(_dis[0] === _minPar){return;}//滚动到最上面，不用再滚动了。
-      _dis[0] = _dis[0] + itemHeigth;
-      if(_dis[0] > _minPar){_dis[0] = _minPar;}
-      scrollerD.animateTransform($(this).find('.scroller'), _dis[0]);
-      currentArr[0] = currentArr[0] - 1;
-      var subId = $(this).find('li').removeClass('active')
-        .eq(currentArr[0]).addClass('active').attr('data-id');
-      scrollerD.updateSubEle(subId);
+      var index = $('.wrapper').index(this), subId;
+      if(_dis[index] === _min[index]){return;}//滚动到最上面，不用再滚动了。
+      _dis[index] = _dis[index] + itemHeigth;
+      if(_dis[index] > _min[index]){_dis[index] = _min[index];}
+      scrollerD.animateTransform($(this).find('.scroller'), _dis[index]);
+      currentArr[index] = currentArr[index] - 1;
+      subId = $(this).find('li').removeClass('active')
+        .eq(currentArr[index]).addClass('active').attr('data-id');
+      if((index+1) !== level){scrollerD.updateSubEle(subId, index);}
+      selectArr[index] = subId;
     };
-    scrollerD.swipeSubUp = function(e){
-      if(_dis[1] === _maxSub){return;}//滚动到最底下，不用再滚动了。
-      _dis[1] = _dis[1] - itemHeigth;
-      if(_dis[1] < _maxSub){_dis[1] = _maxSub;}
-      scrollerD.animateTransform($(this).find('.scroller'), _dis[1]);
-      currentArr[1] = currentArr[1] + 1;
-      var subId = $(this).find('li').removeClass('active')
-        .eq(currentArr[1]).addClass('active').attr('data-id');
-      selectArr[1] = subId;
-    };
-    scrollerD.swipeSubDown = function(e){
-      if(_dis[1] === _minPar){return;}//滚动到最上面，不用再滚动了。
-      _dis[1] = _dis[1] + itemHeigth;
-      if(_dis[1] > _minSub){_dis[1] = _minSub;}
-      scrollerD.animateTransform($(this).find('.scroller'), _dis[1]);
-      currentArr[1] = currentArr[1] - 1;
-      var subId = $(this).find('li').removeClass('active')
-        .eq(currentArr[1]).addClass('active').attr('data-id');
-      selectArr[1] = subId;
-    };
-    scrollerD.updateSubEle = function(subId){
-      scrollerD.createUI(subType[subId], subObj);
-      selectArr[0] = subId;
+    scrollerD.updateSubEle = function(subId, index){
+      scrollerD.createUI(opts.data[index+1][subId], $subObj.eq(index+1), index+1);
     };
     scrollerD.confirmHanlder = function(){
       var typeStr = '';
-      if(!selectArr[0]){
-        typeStr = '';
-      }else if(!selectArr[1]){
-        typeStr = pType[selectArr[0]] + '';
-      }else{
-        typeStr = pType[selectArr[0]] + ' '
-        + subType[selectArr[0]][selectArr[1]];
+      for(var i = 0; i < level; i++){
+        if(!selectArr[i]){
+          return typeStr;
+        }
+        if(i === 0){
+          typeStr += opts.data[i][selectArr[0]];
+        }else{
+          typeStr += ' ' + opts.data[i][selectArr[i-1]][selectArr[i]];
+        }
       }
-      $('#typeD').html(typeStr);
-      $('body').removeClass('stshow');
+      opts.confirmHandler(typeStr);
+      $(' body').removeClass('stshow');
     };
-    scrollerD.getPboundary = function(subCount){
+    scrollerD.getBoundary = function(subCount, index){
       switch(subCount){
         case 0:
-          _maxPar = _minPar = _minSub = _maxSub = 0;
-          selectArr = [];
-          currentArr = [];
+          // _minSub = _maxSub = 0;
+          //从这一级开始到一级都不可滑动
+          scrollerD.reset(_min, level, 0, index);
+          scrollerD.reset(_max, level, 0, index);
+          scrollerD.reset(selectArr, level, undefined, index);
+          scrollerD.reset(currentArr, level, undefined, index);
+          // selectArr[1] = undefined;
+          // currentArr[1] = undefined;
           break;
         case 1:
-          _maxPar = itemHeigth;
-          selectArr[0] = $('#wraPar').find('li').eq(0).attr('data-id');
-          scrollerD.animateTransform(obj.find('.scroller'), itemHeigth);//只有一个的时候滚动到当前元素
-          obj.find('li').addClass('active');
-          _dis[0] = itemHeigth;
-          currentArr[0] = 0;
+          // _maxSub = itemHeigth;
+          // scrollerD.reset(_maxSub, level, itemHeigth, 1);
+          //当前级只有一个选项
+          var subObjI = $subObj.eq(index);
+          _max[index] = itemHeigth;
+          selectArr[index] = subObjI.find('.scroller').eq(0).attr('data-id');
+          scrollerD.animateTransform(subObjI.find('.scroller'), itemHeigth);//只有一个的时候滚动到当前元素
+          subObjI.find('li').addClass('active');
+          _dis[index] = itemHeigth;
+          currentArr[index] = 0;
           break;
         default:
-          _maxPar = (-1)*itemHeigth * (obj.find('li').length-2);
-          var index = 1, selectId = '';
-          if(opts.initData && opts.initData[0]){
-            index = obj.find('li[data-id="'+ opts.initData[0] +'"]')
+          // _maxSub = (-1)*itemHeigth * (subObj.find('li').length-2);
+          var indexLi = 1, selectId = '',subObjI = $subObj.eq(index);
+          _max[index] = (-1)*itemHeigth * (subObjI.find('li').length-2);
+          if(opts.initData && opts.initData[index]){
+            indexLi = subObjI.find('li[data-id="'+ opts.initData[index] +'"]')
               .addClass('active').index();
-            selectId = opts.initData[0];
+            selectId = opts.initData[index];
           }else{
-            selectId = obj.find('li').eq(1).addClass('active').attr('data-id');
+            selectId = subObjI.find('li').eq(1).addClass('active').attr('data-id');
           }
-          selectArr[0] = selectId;
-          currentArr[0] = index;
-          _dis[0] = (-1)*(index-1)*itemHeigth;
-          scrollerD.animateTransform(obj.find('.scroller'), _dis[0]);
-          opts.initData[0] = null;
+          selectArr[index] = selectId;
+          currentArr[index] = indexLi;
+          _dis[index] = (-1)*(indexLi-1)*itemHeigth;
+          scrollerD.animateTransform(subObjI.find('.scroller'), _dis[index]);
+          opts.initData[index] = undefined;
       }
     };
-    scrollerD.getSboundary = function(subCount){
-      switch(subCount){
-        case 0:
-          _minSub = _maxSub = 0;
-          selectArr[1] = undefined;
-          currentArr[1] = undefined;
-          break;
-        case 1:
-          _maxSub = itemHeigth;
-          selectArr[1] = subObj.find('.scroller').eq(0).attr('data-id');
-          scrollerD.animateTransform(subObj.find('.scroller'), itemHeigth);//只有一个的时候滚动到当前元素
-          subObj.find('li').addClass('active');
-          _dis[1] = itemHeigth;
-          currentArr[1] = 0;
-          break;
-        default:
-          _maxSub = (-1)*itemHeigth * (subObj.find('li').length-2);
-          var index = 1, selectId = '';
-          if(opts.initData && opts.initData[1]){
-            index = subObj.find('li[data-id="'+ opts.initData[1] +'"]')
-              .addClass('active').index();
-            selectId = opts.initData[1];
-          }else{
-            selectId = subObj.find('li').eq(1).addClass('active').attr('data-id');
-          }
-          selectArr[1] = selectId;
-          currentArr[1] = index;
-          _dis[1] = (-1)*(index-1)*itemHeigth;
-          scrollerD.animateTransform(subObj.find('.scroller'), _dis[1]);
-          opts.initData = null;
+    scrollerD.reset = function(arr, len, valu, start){
+      start = start || 0;
+      for(var i = start; i < len; i++){
+        arr[i] = valu;
       }
     };
     scrollerD.init();
+    if(opts.isShow){$('body').addClass('stshow');}
+    $(opts.trigger).on('click',function(){$('body').addClass('stshow');});
+    $(opts.mask).on('click', function(){$('body').removeClass('stshow');});
+    $('#confirm').on('click', function(){})
   }
 
   $.scrollerD = {defaults:{
-    selector: '#wraSub',//下一级
+    selector: ['#wraSub'],//下一级
     itemHeigth: 40,//行高
     data: {},//一级数据
     subData: {},//二级数据
-    confirm: '#confirm'//确定
+    confirm: '#confirm',//确定
+    isShow: true,
+    trigger: '#inter',
+    mask: '.mask',
+    confirmHandler: function(){}
   }};
 })(Zepto);

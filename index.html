@@ -17,22 +17,17 @@
     <div class="storeinf_box">
         <form action="">
             <a href="storeName.html" class="bb tip"><label for="">店铺名称</label><span>加多超市</span></a>
-            <a href="#" class="bb"><label for="">地图定位</label><span>光谷金融港</span></a>
-            <a href="storeAddress.html" class="bb tip"><label for="">详细地址</label><span>光谷金融港一路A-13</span></a>
+            <a href="#" class="bb"><label for="">地图定位</label><span>xxxx</span></a>
+            <a href="storeAddress.html" class="bb tip"><label for="">详细地址</label><span>ttttt</span></a>
             <a href="#" class="bb warning" id="type"><label for="">行业分类</label><span  id = 'typeD'>美食&nbsp;小吃快餐</span></a>
             <p class="form_action"><button type="submit" class="orange_btn one">保存</button></p>
         </form>
     </div>
     <div class="mask"></div>
-    <div class="selectType">
-        <div class="selected bboth"></div>
-        <div class="header"><span id="confirm">确定</span></div>
-        <div class="wrapper" id="wraPar"><div class="scroller"></div></div>
-        <div class="wrapper" id="wraSub"><div class="scroller"></div></div>
-    </div>
+    <div class="interaction"></div>
     <script type="text/javascript" src="zepto.min.js"></script>
     <script type="text/javascript" src="touch.js"></script>
-    <script type="text/javascript" src="interaction.min.js"></script>
+    <script type="text/javascript" src="interaction.js"></script>
     <script type="text/javascript">
      var pType = {'01':"美食", '02': '休闲娱乐', '03': '酒店', '04': '旅游', '05': '丽人', '06': '生活服务', '07': '购物', '08': '家装', '09': '其他'},
       subType = {
@@ -46,9 +41,8 @@
         '08': {'0801': '装修设计', '0802': '厨房卫浴', '0803': '建材', '0804': '家具家居', '0805': '家用电器'},
         '09': {'0901':'其他'}
       };
-      $('#wraPar').scrollerD({selector: '#wraSub', data: [pType, subType], initData:['01', '0101']});
-      $('#type').click(function(){$('body').addClass('stshow');});
-      $('.mask').click(function(){$('body').removeClass('stshow');});
+      $('.interaction').scrollerD({data: [pType, subType, {'0101': {'010101': '面包甜点','010102': '面食','010103': '盒饭'}}], initData:['01', '0101'],
+        trigger:'#type',confirmHandler: function(typeStr){$('#typeD').html(typeStr);}});
     </script>
 </body>
 </html>
