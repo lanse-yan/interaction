@@ -3,8 +3,8 @@
     if(!this.length){return};
     opts = $.extend({},$.scrollerD.defaults,opts);
     var $wrap = this, $subObj,
-    pType, subType,itemHeigth,currentArr=[1,1],selectArr=[],_dis=[0,0],
-    _max=[], _min=[], scrollerD = {},level=2;
+    pType, subType,itemHeigth,currentArr=[1,1],selectArr=[],_dis=[],
+    _max=[], _min=[], scrollerD = {},level=1;
 
     scrollerD.init = function(){
       itemHeigth = opts.itemHeigth;
@@ -17,11 +17,10 @@
       for(var i = 1; i < level; i++){
         scrollerD.createUI(opts.data[i][selectArr[i-1]], $subObj.eq(i), i);
       }
-
       $wrap.on('touchmove', function(e){e.preventDefault();});
       $subObj.swipeUp(scrollerD.swipeUp);
       $subObj.swipeDown(scrollerD.swipeDown);
-      $(opts.confirm).on('click', scrollerD.confirmHanlder);
+      $wrap.find('.confirm').on('click', scrollerD.confirmHanlder);
     };
     scrollerD.animateTransform = function(obj, dis){
       var value = {'transform': 'translate3d(0, ' + dis
@@ -30,7 +29,8 @@
       obj.css(value);
     };
     scrollerD.createWrap = function(){
-      var htmlArr = ['<div class="selected bboth"></div><div class="header"><span id="confirm">确定</span></div>'];
+      var htmlArr = ['<div class="selected bboth">'];
+      htmlArr.push(opts.selectHtml, '</div><div class="header"><span class="confirm">确定</span></div>');
       for(var i = 0; i < level; i++){
         htmlArr.push('<div class="wrapper"><div class="scroller"></div></div>');
       }
@@ -46,14 +46,9 @@
       });
       $el.append($ul);
       scrollerD.getBoundary($el.find('li').length, index);
-      // if(isPar){
-      //   scrollerD.getPboundary($el.find('li').length);
-      // }else{
-      //   scrollerD.getSboundary($el.find('li').length, index);
-      // }
     };
     scrollerD.swipeUp = function(e){
-      var index = $('.wrapper').index(this), subId;
+      var index = $subObj.index(this), subId;
       if(_dis[index] === _max[index]){return;}//滚动到最底下，不用再滚动了。
       _dis[index] = _dis[index] - itemHeigth;
       if(_dis[index] < _max[index]){_dis[index] = _max[index];}
@@ -65,7 +60,7 @@
       selectArr[index] = subId;
     };
     scrollerD.swipeDown = function(e){
-      var index = $('.wrapper').index(this), subId;
+      var index = $subObj.index(this), subId;
       if(_dis[index] === _min[index]){return;}//滚动到最上面，不用再滚动了。
       _dis[index] = _dis[index] + itemHeigth;
       if(_dis[index] > _min[index]){_dis[index] = _min[index];}
@@ -91,24 +86,22 @@
           typeStr += ' ' + opts.data[i][selectArr[i-1]][selectArr[i]];
         }
       }
+      scrollerD.selectVal = typeStr;
       opts.confirmHandler(typeStr);
+      $wrap.add(opts.mask).hide();
       $(' body').removeClass('stshow');
     };
     scrollerD.getBoundary = function(subCount, index){
       switch(subCount){
         case 0:
-          // _minSub = _maxSub = 0;
           //从这一级开始到一级都不可滑动
           scrollerD.reset(_min, level, 0, index);
           scrollerD.reset(_max, level, 0, index);
+          scrollerD.reset(_dis, level, 0, index);
           scrollerD.reset(selectArr, level, undefined, index);
           scrollerD.reset(currentArr, level, undefined, index);
-          // selectArr[1] = undefined;
-          // currentArr[1] = undefined;
           break;
         case 1:
-          // _maxSub = itemHeigth;
-          // scrollerD.reset(_maxSub, level, itemHeigth, 1);
           //当前级只有一个选项
           var subObjI = $subObj.eq(index);
           _max[index] = itemHeigth;
@@ -119,10 +112,12 @@
           currentArr[index] = 0;
           break;
         default:
-          // _maxSub = (-1)*itemHeigth * (subObj.find('li').length-2);
           var indexLi = 1, selectId = '',subObjI = $subObj.eq(index);
           _max[index] = (-1)*itemHeigth * (subObjI.find('li').length-2);
           if(opts.initData && opts.initData[index]){
+            if($.isArray(opts.data[index])){//如果是array，则InitData是具体值，不是索引。
+              opts.initData[index] = opts.data[index].indexOf(opts.initData[index]);
+            }
             indexLi = subObjI.find('li[data-id="'+ opts.initData[index] +'"]')
               .addClass('active').index();
             selectId = opts.initData[index];
@@ -143,10 +138,18 @@
       }
     };
     scrollerD.init();
-    if(opts.isShow){$('body').addClass('stshow');}
-    $(opts.trigger).on('click',function(){$('body').addClass('stshow');});
-    $(opts.mask).on('click', function(){$('body').removeClass('stshow');});
-    $('#confirm').on('click', function(){})
+    if(opts.isShow){$wrap.add(opts.mask).show();}
+    $(opts.trigger).on('click',function(){
+      $wrap.add(opts.mask).show();
+      return false;
+    });
+    $(opts.mask).on('click', function(){
+      $wrap.add(opts.mask).hide();
+    });
+    return {
+      selectArr: selectArr,//选择元素的id
+      selectVal: scrollerD.selectVal
+    }
   }
 
   $.scrollerD = {defaults:{
@@ -154,10 +157,10 @@
     itemHeigth: 40,//行高
     data: {},//一级数据
     subData: {},//二级数据
-    confirm: '#confirm',//确定
     isShow: true,
     trigger: '#inter',
     mask: '.mask',
+    selectHtml: '',
     confirmHandler: function(){}
   }};
 })(Zepto);

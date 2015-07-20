@@ -12,3 +12,5 @@ data[n]是n-1级数据。
 
 initData分别是一级数据的id和二级数据的id。trigger表现触发的显示的元素。confirmHandler表示获取选择结果
 后的处理函数。
+
+如果data = [[1,2,3]]是这种一维数组，则initData里的值指的是data中的具体值，而不是id。
